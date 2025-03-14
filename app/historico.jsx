@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Linking } from "react-native";
+// app/historico.jsx
+import React from 'react';
+import { View, Text, FlatList, StyleSheet, Linking, Share, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Historico() {
   const { qrList } = useLocalSearchParams();
@@ -12,52 +14,80 @@ export default function Historico() {
     } else {
       setQrListArray([]);
     }
-  }, [qrList]); // Executa quando qrList mudar
-}
-const renderItem = async ({ item, index }) => {
-  const validURL = await Linking.canOpenURL(item);
+  }, [qrList]);
 
-  if (validURL) {
+  const handleShare = async (content) => {
+    try {
+      await Share.share({
+        message: content,
+      });
+    } catch (error) {
+      console.error("Erro ao compartilhar", error);
+    }
+  };
+
+  const renderItem = ({ item, index }) => {
     return (
       <View style={styles.listItem}>
-        <Text
-          style={[
-            styles.listText,
-            { color: "blue", textDecorationLine: "underline" },
-          ]}
-          onPress={() => Linking.openURL(item)}
+        <Text 
+          style={[styles.listText, item.isUrl && styles.urlText]}
+          onPress={() => item.isUrl && Linking.openURL(item)}
+          onLongPress={() => handleShare(item)}
         >
-          {item}
+          {`${index + 1}. ${item}`}
         </Text>
       </View>
     );
-  }
+  };
 
   return (
-    <View style={styles.listItem}>
-      <Text style={styles.listText}>{`${index + 1}. ${item}`}</Text>
+    <View style={styles.historyContainer}>
+      <FlatList
+        data={qrListArray}
+        renderItem={renderItem}
+        keyExtractor={(_, index) => index.toString()}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>
+            Nenhum QR Code escaneado ainda
+          </Text>
+        }
+      />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   historyContainer: {
     flex: 1,
-    padding: 20,
+    padding: 15,
     backgroundColor: "#fff",
   },
-  historyTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
   listItem: {
-    padding: 10,
+    padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  itemContent: {
+    flex: 1,
   },
   listText: {
     fontSize: 16,
+    color: "#000",
   },
+  urlText: {
+    color: "#007AFF",
+    textDecorationLine: "underline",
+  },
+  shareButton: {
+    padding: 8,
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: "#666",
+    marginTop: 20,
+  }
 });

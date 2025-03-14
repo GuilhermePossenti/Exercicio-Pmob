@@ -2,11 +2,15 @@
   "expo": {
     "name": "QRCodeApp",
     "slug": "QRCodeApp",
+    "scheme": "qrcodeapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -26,16 +30,17 @@
     },
     "plugins": [
       [
-        "expo-router"
-      ],
-      [
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
-    ]
+      ],
+      "expo-router"
+    ],
+    "extra": {
+      "EXPO_ROUTER_APP_ROOT": "./app"
+    }
   }
 }
